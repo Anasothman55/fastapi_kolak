@@ -27,7 +27,6 @@ class UserRepositoryServer:
   async def get_by_uid(self, uid: uuid.UUID):
     return await self._statement("uid", uid)
 
-
 class AuthenticationService:
   def __init__(self,db: AsyncSession):
     self.db = db
@@ -45,12 +44,17 @@ class AuthenticationService:
 
   async def authenticate_user(self, email: str, password: str) -> UserModel:
     user = await self.user_repo.get_by_email(str(email))
-
     if not user:
-      raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+      raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail={"error": "User not found", "hint": "Please check the email address","loc":"email"}
+      )
 
     if not verify_password_utils(password, user.hash_password):
-      raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid password")
+      raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail={"error": "Invalid password", "hint": "Ensure the password is correct", "loc": "password"}
+      )
 
     return user
 
@@ -80,3 +84,5 @@ class TokenService:
       secure=True,  # Added secure flag for HTTPS
       samesite='lax'  # Added samesite protection
     )
+
+

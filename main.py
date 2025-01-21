@@ -6,7 +6,7 @@ from app.db.index import get_db,AsyncSession,close_db_connection,init_db, text
 from contextlib import asynccontextmanager
 from typing import Annotated
 from app.router.user_auth import auth_router
-from app.util.user_auth import register_all_errors
+from app.util.user_auth import user_auth_exception
 from app.middleware import register_middleware
 
 
@@ -37,7 +37,7 @@ app = FastAPI(
   lifespan=life_span
 )
 
-register_all_errors(app)
+user_auth_exception(app)
 
 @app.get("/helth", status_code= status.HTTP_200_OK)
 async def helth(db: Annotated[AsyncSession, Depends(get_db)]):
@@ -74,8 +74,8 @@ app.include_router(auth_router, prefix=f"/{version}/auth")
 """
 alembic
 1- alembic init -t async migrations
-2-  alembic revision --autogenerate -m "remove is_verify"
-3- alembic upgrade a42a831f8a84    
+2- alembic revision --autogenerate -m "first"
+3- -m "first"-> alembic upgrade 8feb36700243    
 """
 
 

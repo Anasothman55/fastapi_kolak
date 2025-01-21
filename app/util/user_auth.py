@@ -59,11 +59,14 @@ async def validation_exception_handler(request: Request, exc: ValidationErrorWit
   )
 
 
-def register_all_errors(app: FastAPI):
+def user_auth_exception(app: FastAPI):
   app.add_exception_handler(
     ValidationErrorWithUnique,
     validation_exception_handler
   )
+
+
+
 
 
 

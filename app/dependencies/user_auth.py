@@ -1,13 +1,12 @@
-from typing import Annotated
 
-from sqlalchemy.util.langhelpers import repr_tuple_names
-
-from app.models.user import UserModel
 from app.service.user_auth import UserRepositoryServer
-from app.db.index import get_db
-from fastapi import Request,status, HTTPException, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 from app.util.user_auth import jwt_decode, CheckAccessTokenData
+from fastapi import status, HTTPException, Depends, Response, Request
+from app.service.user_auth import AuthenticationService, TokenService
+from app.crud.user_auth import UserAuthCrud
+from app.db.index import get_db,AsyncSession
+from typing import Annotated
+from app.core.config import config
 
 
 
@@ -35,3 +34,16 @@ async def get_current_user(
   return token_data.user
 
 
+def get_token_service() -> TokenService:
+  return TokenService(config)
+def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthenticationService:
+  return AuthenticationService(db)
+
+
+def get_user_auth_crud(
+  db: Annotated[AsyncSession, Depends(get_db)],
+  response: Response,
+  token_service: Annotated[TokenService, Depends(get_token_service)],
+  auth_service: Annotated[AuthenticationService, Depends(get_auth_service)],
+) -> UserAuthCrud:
+  return UserAuthCrud(db, response, token_service, auth_service)
