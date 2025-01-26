@@ -10,7 +10,6 @@ from alembic import context
 
 
 
-from app.models.user import UserModel
 from sqlmodel import SQLModel
 from app.core.config import config as _config
 # this is the Alembic Config object, which provides
@@ -28,6 +27,11 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
+
+from app.models.model import (
+    UserModel,EmployeeModel,StockModels,EmployeeDailyWork,UseProductModels
+)
+
 
 target_metadata = SQLModel.metadata
 

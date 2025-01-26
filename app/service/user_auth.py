@@ -1,5 +1,5 @@
 
-from ..models.user import UserModel
+from ..models.model import UserModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated, Any
 from sqlmodel import select
@@ -26,6 +26,7 @@ class UserRepositoryServer:
 
   async def get_by_uid(self, uid: uuid.UUID):
     return await self._statement("uid", uid)
+
 
 class AuthenticationService:
   def __init__(self,db: AsyncSession):
@@ -58,6 +59,8 @@ class AuthenticationService:
 
     return user
 
+
+
 class TokenService:
   def __init__(self, config):
     self.config = config
@@ -80,7 +83,7 @@ class TokenService:
       key="access_token",
       value=token,
       httponly=True,
-      expires=60 * 60,
+      expires=60 * 60 * 24 * 7,
       secure=True,  # Added secure flag for HTTPS
       samesite='lax'  # Added samesite protection
     )

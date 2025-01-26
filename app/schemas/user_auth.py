@@ -1,6 +1,6 @@
 
 from datetime import datetime, date
-from pydantic import BaseModel, Field, ConfigDict, EmailStr, ValidationError, field_validator
+from pydantic import BaseModel, Field, ConfigDict, EmailStr, StrictStr
 import uuid
 from enum import Enum
 
@@ -14,10 +14,10 @@ class RoleBase(str, Enum):
   superuser = "superuser"
 
 class UserBase(BaseModel):
-  username: str = Field(max_length=128)
+  username: StrictStr = Field(...,max_length=128)
   email: EmailStr
-  first_name: str = Field( max_length=128, pattern=r"^[A-Za-z]+$")
-  last_name: str = Field(max_length=128, pattern=r"^[A-Za-z]+$")
+  first_name: str = Field(min_length=2, max_length=128, pattern=r"^[A-Za-z]+$")
+  last_name: str = Field(min_length=2, max_length=128, pattern=r"^[A-Za-z]+$")
 
   model_config = ConfigDict(
     str_strip_whitespace=True,
@@ -83,6 +83,7 @@ class CreateUser(UserBase):
 
   model_config = ConfigDict(
     str_strip_whitespace=True,
+    extra='forbid',
     json_schema_extra={
       "example": {
         "first_name": "John",

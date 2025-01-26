@@ -30,7 +30,6 @@ async def get_current_user(
   token_data = CheckAccessTokenData(**payload, get_user_by_uid=user_repo.get_by_uid, db=db)
   await token_data.validate()
 
-
   return token_data.user
 
 

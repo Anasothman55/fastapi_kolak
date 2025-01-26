@@ -1,5 +1,5 @@
 import uuid
-
+from rich import print
 from passlib.context import CryptContext
 from typing import Dict, Any, Callable, Optional
 from fastapi import FastAPI, status, Request, HTTPException
@@ -12,8 +12,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import config
 from jose import jwt, JWTError
 from dataclasses import  dataclass
-
-from app.models.user import UserModel
+from rich import print
+from app.models.model import UserModel
 
 
 
@@ -34,7 +34,7 @@ def error_schema(body: str, field: str):
   return {
     "type": "conflict",
     "loc": ["body", body],
-    "msg": "Username already exists",
+    "msg": f"{body} already exists",
     "input": {body: field}
   }
 
@@ -47,6 +47,7 @@ async def validation_exception_handler(request: Request, exc: ValidationErrorWit
   error_details = []
   if exc.pydantic_errors:
     error_details.extend(exc.pydantic_errors)
+  print(exc.unique_errors)
   if exc.unique_errors:
     for field, error in exc.unique_errors.items():
       if isinstance(error, dict):

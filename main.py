@@ -5,9 +5,11 @@ from fastapi.responses import JSONResponse
 from app.db.index import get_db,AsyncSession,close_db_connection,init_db, text
 from contextlib import asynccontextmanager
 from typing import Annotated
-from app.router.user_auth import auth_router
 from app.util.user_auth import user_auth_exception
 from app.middleware import register_middleware
+from app.core.make_admin import create_admin
+
+
 
 
 
@@ -15,6 +17,8 @@ from app.middleware import register_middleware
 async def life_span(app: FastAPI):
   try:
     await init_db()
+    admin_create = await create_admin()
+    print(f"Admin created: {admin_create}")
     print("Application startup complete")
   except Exception as e:
     print("Error during startup: " + str(e))
@@ -36,6 +40,8 @@ app = FastAPI(
   version=version,
   lifespan=life_span
 )
+
+
 
 user_auth_exception(app)
 
@@ -68,14 +74,22 @@ async def internal_server_error(request, ext):
 
 register_middleware(app)
 
-app.include_router(auth_router, prefix=f"/{version}/auth")
 
+from app.router.user_auth import auth_router
+from app.router.employee import emp_router
+from app.router.stock import stock_router
+from app.router.use_item import use_item_route
+
+app.include_router(auth_router, prefix=f"/api/{version}/auth")
+app.include_router(emp_router, prefix=f"/api/{version}/employee")
+app.include_router(use_item_route, prefix=f"/api/{version}/use-stock")  # added this line to include the route in the main router group.
+app.include_router(stock_router, prefix=f"/api/{version}/stock")
 
 """
 alembic
 1- alembic init -t async migrations
-2- alembic revision --autogenerate -m "first"
-3- -m "first"-> alembic upgrade 8feb36700243    
+2- alembic revision --autogenerate -m "fix timestamp"
+3- -m "first"-> alembic upgrade d58947e48e76    
 """
 
 
